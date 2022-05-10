@@ -41,20 +41,21 @@ def move(a):
             hero_index[0] -= 1
         if keys[pygame.K_DOWN] and hero_index[0] < 93:
             hero_index[0] += 1
-    if desk.count == 0:
-        desk.count += 1
-    else:
-        stop = 0
-        desk.count = 0
     if 20 <= desk.dsk[hero_index[0]][hero_index[1]] < 24:
-        if stop == 1:
+        desk.count += 1
+        if desk.count == 2:
             desk.tree += 1
             stop = 0
             desk.count = 0
         else:
-            stop += 1
+            stop = 1
             hero_index[0], hero_index[1] = s_x, s_y
+    else:
+        stop = 0
+        desk.count = 0
+
     desk.dsk[hero_index[0]][hero_index[1]] = 1
+    print(desk.count)
 
 
 class Desk(Hero):
