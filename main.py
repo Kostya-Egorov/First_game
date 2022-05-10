@@ -165,17 +165,20 @@ desk = Desk(sc)
 desk.create_desk()
 
 while 1:
+    c_x, c_y = pygame.mouse.get_pos()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if 1660 >= c_x >= 1290 and 1024 >= c_y >= 950:
+                exit()
             move(1)
             count_tree = font.render(str(desk.tree), True, WHITE)
         if event.type == pygame.KEYDOWN:
             move(2)
             count_tree = font.render(str(desk.tree), True, WHITE)
     desk.show_desk()
-    c_x, c_y = pygame.mouse.get_pos()
+
     if 480 < c_x < 720 and 400 < c_y < 640:
         if stop == 0:
             sc.blit(box_selector1, (c_x - (c_x % 80), c_y - (c_y % 80)))
