@@ -64,6 +64,7 @@ class Desk(Hero):
         self.dsk = [[0 for _ in range(100)] for _ in range(100)]
         self.screen = screen
         self.x, self.y = 0, 0
+        self.count_intfc = 0
 
     def create_desk(self):
         for i in range(50):
@@ -107,13 +108,18 @@ class Desk(Hero):
                     x += 80
                 x = 0
                 y += 80
+
     def show_interface(self):
         sc.blit(interface, (1280, 0))
         sc.blit(btn_building, (1290, 470))
+        sc.blit(btn_hero, (1520, 470))
         sc.blit(btn_quit, (1290, 950))
         sc.blit(btn_save, (1290, 770))
         sc.blit(btn_load, (1290, 860))
-        desk.hero_stats(font)
+        if self.count_intfc == 0:
+            desk.hero_stats(font)
+        elif self.count_intfc == 1:
+            pass
         sc.blit(count_tree, [1330, 415])
         sc.blit(count_rock, [1445, 415])
 
@@ -150,9 +156,11 @@ box_selector1.set_colorkey((255, 255, 255))
 box_selector2.set_colorkey((255, 255, 255))
 interface = pygame.image.load("Textures/Interface.png").convert()
 btn_building = pygame.image.load("Textures/Buttons/building.png").convert()
+btn_hero = pygame.image.load("Textures/Buttons/btn_hero.png").convert()
 btn_quit = pygame.image.load("Textures/Buttons/quit.png").convert()
 btn_load = pygame.image.load("Textures/Buttons/load.png").convert()
 btn_save = pygame.image.load("Textures/Buttons/save.png").convert()
+blt_chest = pygame.image.load("Textures/Building/Chests.png").convert()
 all_img = [grass, tree1, tree2, tree3, tree4, cursor, box_selector1]
 
 font = pygame.font.Font(None, 60)
