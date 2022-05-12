@@ -10,6 +10,8 @@ class Hero:
         self.count = 0
         self.name = "Nersop"
         self.lvl = 0
+        self.building = False
+        self.build_num = 0
 
     def hero_stats(self, font):
         sc.blit(self.hero, (1300, 15))
@@ -53,7 +55,10 @@ def move(a):
     else:
         stop = 0
         desk.count = 0
-
+    if 101 <= desk.dsk[hero_index[0]][hero_index[1]] <= 102:
+        if desk.dsk[hero_index[0]][hero_index[1]] == 101:
+            desk.count_intfc = 2
+        hero_index[0], hero_index[1] = s_x, s_y
     desk.dsk[hero_index[0]][hero_index[1]] = 1
     print(desk.count)
 
@@ -105,6 +110,12 @@ class Desk(Hero):
                     elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 23:
                         tree[3].set_colorkey((255, 255, 255))
                         self.screen.blit(tree[3], (x, y))
+                    elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 101:
+                        self.screen.blit(grass, (x, y))
+                        self.screen.blit(blt_chest, (x, y))
+                    elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 102:
+                        self.screen.blit(grass, (x, y))
+                        self.screen.blit(blt_wall, (x, y))
                     x += 80
                 x = 0
                 y += 80
@@ -119,6 +130,9 @@ class Desk(Hero):
         if self.count_intfc == 0:
             desk.hero_stats(font)
         elif self.count_intfc == 1:
+            sc.blit(blt_chest, (1295, 15))
+            sc.blit(blt_wall, (1375, 15))
+        elif self.count_intfc == 2:
             pass
         sc.blit(count_tree, [1330, 415])
         sc.blit(count_rock, [1445, 415])
@@ -137,7 +151,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 
-FPS = 40
+FPS = 60
 clock = pygame.time.Clock()
 
 pygame.mouse.set_visible(False)
@@ -161,6 +175,8 @@ btn_quit = pygame.image.load("Textures/Buttons/quit.png").convert()
 btn_load = pygame.image.load("Textures/Buttons/load.png").convert()
 btn_save = pygame.image.load("Textures/Buttons/save.png").convert()
 blt_chest = pygame.image.load("Textures/Building/Chests.png").convert()
+blt_chest.set_colorkey((255, 255, 255))
+blt_wall = pygame.image.load("Textures/Building/Wall.png").convert()
 all_img = [grass, tree1, tree2, tree3, tree4, cursor, box_selector1]
 
 font = pygame.font.Font(None, 60)
@@ -181,13 +197,46 @@ while 1:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if 1660 >= c_x >= 1290 and 1024 >= c_y >= 950:
                 exit()
-            move(1)
-            count_tree = font.render(str(desk.tree), True, WHITE)
-        if event.type == pygame.KEYDOWN:
-            move(2)
-            count_tree = font.render(str(desk.tree), True, WHITE)
-    desk.show_desk()
+            if not desk.building:
+                move(1)
+                count_tree = font.render(str(desk.tree), True, WHITE)
+            if 480 < c_x < 720 and 400 < c_y < 640 and desk.building:
+                if 720 > c_x - (c_x % 80) > 560 and 640 > c_y - (c_y % 80) > 480:
+                    desk.dsk[hero_index[0] + 1][hero_index[1] + 1] = desk.build_num
+                elif 640 > c_x - (c_x % 80) > 480 and 640 > c_y - (c_y % 80) > 480:
+                    desk.dsk[hero_index[0] + 1][hero_index[1]] = desk.build_num
+                elif 560 > c_x - (c_x % 80) > 400 and 640 > c_y - (c_y % 80) > 480:
+                    desk.dsk[hero_index[0] + 1][hero_index[1] - 1] = desk.build_num
+                elif 560 > c_x - (c_x % 80) > 400 and 560 > c_y - (c_y % 80) > 400:
+                    desk.dsk[hero_index[0]][hero_index[1] - 1] = desk.build_num
+                elif 560 > c_x - (c_x % 80) > 400 and 480 > c_y - (c_y % 80) > 320:
+                    desk.dsk[hero_index[0] - 1][hero_index[1] - 1] = desk.build_num
+                elif 640 > c_x - (c_x % 80) > 480 and 480 > c_y - (c_y % 80) > 320:
+                    desk.dsk[hero_index[0] - 1][hero_index[1]] = desk.build_num
+                elif 720 > c_x - (c_x % 80) > 560 and 560 > c_y - (c_y % 80) > 400:
+                    desk.dsk[hero_index[0]][hero_index[1] + 1] = desk.build_num
+                elif 720 > c_x - (c_x % 80) > 560 and 480 > c_y - (c_y % 80) > 320:
+                    desk.dsk[hero_index[0] - 1][hero_index[1] + 1] = desk.build_num
+                desk.building = False
+            if desk.count_intfc == 1:
+                if 1375 > c_x > 1295 and 95 > c_y > 15:
+                    desk.building = True
+                    desk.build_num = 101
+                elif 1465 > c_x > 1375 and 95 > c_y > 15:
+                    desk.building = True
+                    desk.build_num = 102
+            if 1437 > c_x > 1290 and 555> c_y > 470:
+                desk.count_intfc = 1
+            elif 1667 > c_x > 1520 and 555 > c_y > 470:
+                desk.count_intfc = 0
 
+        if event.type == pygame.KEYDOWN:
+            if pygame.K_ESCAPE and desk.building:
+                desk.building = False
+            else:
+                move(2)
+                count_tree = font.render(str(desk.tree), True, WHITE)
+    desk.show_desk()
     if 480 < c_x < 720 and 400 < c_y < 640:
         if stop == 0:
             sc.blit(box_selector1, (c_x - (c_x % 80), c_y - (c_y % 80)))
@@ -195,6 +244,12 @@ while 1:
             sc.blit(box_selector2, (c_x - (c_x % 80), c_y - (c_y % 80)))
     desk.show_interface()
     sc.blit(cursor, (c_x, c_y))
+    if desk.building:
+        if c_x < 1280:
+            if desk.build_num == 101:
+                sc.blit(blt_chest, (c_x - (c_x % 80), c_y - (c_y % 80)))
+            elif desk.build_num == 102:
+                sc.blit(blt_wall, (c_x - (c_x % 80), c_y - (c_y % 80)))
     pygame.display.update()
 
     clock.tick(FPS)
