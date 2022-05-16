@@ -60,7 +60,6 @@ def move(a):
             desk.count_intfc = 2
         hero_index[0], hero_index[1] = s_x, s_y
     desk.dsk[hero_index[0]][hero_index[1]] = 1
-    print(desk.count)
 
 
 class Desk(Hero):
@@ -131,7 +130,11 @@ class Desk(Hero):
             desk.hero_stats(font)
         elif self.count_intfc == 1:
             sc.blit(blt_chest, (1295, 15))
+            sc.blit(price, (1335, 90))
+            sc.blit(font.render(str(5), True, WHITE), (1310, 93))
             sc.blit(blt_wall, (1375, 15))
+            sc.blit(price, (1410, 100))
+            sc.blit(font.render(str(8), True, WHITE), (1387, 100))
         elif self.count_intfc == 2:
             pass
         sc.blit(count_tree, [1330, 415])
@@ -175,8 +178,10 @@ btn_quit = pygame.image.load("Textures/Buttons/quit.png").convert()
 btn_load = pygame.image.load("Textures/Buttons/load.png").convert()
 btn_save = pygame.image.load("Textures/Buttons/save.png").convert()
 blt_chest = pygame.image.load("Textures/Building/Chests.png").convert()
+price = pygame.image.load("Textures/Building/Price.png").convert()
 blt_chest.set_colorkey((255, 255, 255))
 blt_wall = pygame.image.load("Textures/Building/Wall.png").convert()
+blt_wall.set_colorkey((255, 255, 255))
 all_img = [grass, tree1, tree2, tree3, tree4, cursor, box_selector1]
 
 font = pygame.font.Font(None, 60)
