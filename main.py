@@ -1,5 +1,6 @@
 import pygame
 import random
+from save import *
 
 
 class Hero:
@@ -21,7 +22,7 @@ class Hero:
 
 def move(a):
     global stop
-    desk.dsk[hero_index[0]][hero_index[1]] = 0
+    desk.dsk[hero_index[0]][hero_index[1]] = random.randrange(11, 14)
     s_x, s_y = hero_index[0], hero_index[1]
     if a == 1:
         c_x, c_y = pygame.mouse.get_pos()
@@ -43,10 +44,13 @@ def move(a):
             hero_index[0] -= 1
         if keys[pygame.K_DOWN] and hero_index[0] < 93:
             hero_index[0] += 1
-    if 20 <= desk.dsk[hero_index[0]][hero_index[1]] < 24:
+    if 20 <= desk.dsk[hero_index[0]][hero_index[1]] < 24 or 30 <= desk.dsk[hero_index[0]][hero_index[1]] <= 32:
         desk.count += 1
         if desk.count == 2:
-            desk.tree += 1
+            if desk.dsk[hero_index[0]][hero_index[1]] < 24:
+                desk.tree += 1
+            elif desk.dsk[hero_index[0]][hero_index[1]] >= 30:
+                desk.rock += 1
             stop = 0
             desk.count = 0
         else:
@@ -65,7 +69,7 @@ def move(a):
 class Desk(Hero):
     def __init__(self, screen):
         super().__init__()
-        self.dsk = [[0 for _ in range(100)] for _ in range(100)]
+        self.dsk = [[random.randrange(11, 14) for _ in range(100)] for _ in range(100)]
         self.screen = screen
         self.x, self.y = 0, 0
         self.count_intfc = 0
@@ -73,15 +77,11 @@ class Desk(Hero):
     def create_desk(self):
         for i in range(50):
             for j in range(random.randrange(0, 4), 50, random.randrange(3, 8)):
-                a = random.randrange(0, 4)
-                if a == 0:
-                    self.dsk[i][j] = 20
-                elif a == 1:
-                    self.dsk[i][j] = 21
-                elif a == 2:
-                    self.dsk[i][j] = 22
-                elif a == 3:
-                    self.dsk[i][j] = 23
+                b = random.randrange(0, 14)
+                if b == 13:
+                    self.dsk[i][j] = random.randrange(30, 33)
+                else:
+                    self.dsk[i][j] = random.randrange(20, 24)
         self.dsk[hero_index[0]][hero_index[1]] = 1
 
     def show_desk(self):
@@ -90,14 +90,18 @@ class Desk(Hero):
             for i in range(H // 80):
                 a = ((hero_index[0] - 6) + i) * (((hero_index[0] - 6) + i) > 0)
                 for j in range(16):
-                    if self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 0:
-                        self.screen.blit(grass, (x, y))
+                    if self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 11:
+                        self.screen.blit(grass1, (x, y))
+                    elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 12:
+                        self.screen.blit(grass2, (x, y))
+                    elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 13:
+                        self.screen.blit(grass3, (x, y))
                     elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 1:
-                        self.screen.blit(grass, (x, y))
+                        self.screen.blit(grass1, (x, y))
                         self.hero.set_colorkey((255, 255, 255))
                         self.screen.blit(self.hero, (x, y))
                         self.x, self.y = a, j
-                    if self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 20:
+                    elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 20:
                         tree[0].set_colorkey((255, 255, 255))
                         self.screen.blit(tree[0], (x, y))
                     elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 21:
@@ -109,11 +113,20 @@ class Desk(Hero):
                     elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 23:
                         tree[3].set_colorkey((255, 255, 255))
                         self.screen.blit(tree[3], (x, y))
+                    elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 30:
+                        self.screen.blit(grass1, (x, y))
+                        self.screen.blit(rock1, (x, y))
+                    elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 31:
+                        self.screen.blit(grass1, (x, y))
+                        self.screen.blit(rock2, (x, y))
+                    elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 32:
+                        self.screen.blit(grass1, (x, y))
+                        self.screen.blit(rock3, (x, y))
                     elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 101:
-                        self.screen.blit(grass, (x, y))
+                        self.screen.blit(grass1, (x, y))
                         self.screen.blit(blt_chest, (x, y))
                     elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 102:
-                        self.screen.blit(grass, (x, y))
+                        self.screen.blit(grass1, (x, y))
                         self.screen.blit(blt_wall, (x, y))
                     x += 80
                 x = 0
@@ -136,7 +149,15 @@ class Desk(Hero):
             sc.blit(price, (1410, 100))
             sc.blit(font.render(str(8), True, WHITE), (1387, 100))
         elif self.count_intfc == 2:
-            pass
+            sc.blit(font.render(str("Сохранить в:"), True, WHITE), (1340, 16))
+            sc.blit(save1_img, (1300, 70))
+            sc.blit(save2_img, (1300, 160))
+            sc.blit(save2_img, (1300, 250))
+        elif self.count_intfc == 3:
+            sc.blit(font.render(str("Загрузить:"), True, WHITE), (1340, 16))
+            sc.blit(save1_img, (1300, 70))
+            sc.blit(save2_img, (1300, 160))
+            sc.blit(save2_img, (1300, 250))
         sc.blit(count_tree, [1330, 415])
         sc.blit(count_rock, [1445, 415])
 
@@ -159,12 +180,21 @@ clock = pygame.time.Clock()
 
 pygame.mouse.set_visible(False)
 
-grass = pygame.image.load("Textures/TexturedGrass.png").convert()
+grass1 = pygame.image.load("Textures/TexturedGrass.png").convert()
+grass2 = pygame.image.load("Textures/TexturedGrass2.png").convert()
+grass3 = pygame.image.load("Textures/TexturedGrass3.png").convert()
 tree1 = pygame.image.load("Textures/Tree1.png").convert()
 tree2 = pygame.image.load("Textures/Tree2.png").convert()
 tree3 = pygame.image.load("Textures/Tree3.png").convert()
 tree4 = pygame.image.load("Textures/Tree4.png").convert()
 tree = [tree1, tree2, tree3, tree4]
+rock1 = pygame.image.load("Textures/Rocks.png").convert()
+rock1.set_colorkey((255, 255, 255))
+rock2 = pygame.image.load("Textures/Rocks2.png").convert()
+rock2.set_colorkey((255, 255, 255))
+rock3 = pygame.image.load("Textures/Rocks3.png").convert()
+rock3.set_colorkey((255, 255, 255))
+rock = [rock1, rock2, rock3]
 cursor = pygame.image.load("Textures/cursor.png").convert()
 cursor.set_colorkey((255, 255, 255))
 box_selector1 = pygame.image.load("Textures/BoxSelector1.png").convert()
@@ -182,7 +212,10 @@ price = pygame.image.load("Textures/Building/Price.png").convert()
 blt_chest.set_colorkey((255, 255, 255))
 blt_wall = pygame.image.load("Textures/Building/Wall.png").convert()
 blt_wall.set_colorkey((255, 255, 255))
-all_img = [grass, tree1, tree2, tree3, tree4, cursor, box_selector1]
+save1_img = pygame.image.load("Textures/Saves/save1.png").convert()
+save2_img = pygame.image.load("Textures/Saves/save2.png").convert()
+save3_img = pygame.image.load("Textures/Saves/save3.png").convert()
+all_img = [grass1, tree1, tree2, tree3, tree4, cursor, box_selector1]
 
 font = pygame.font.Font(None, 60)
 count_tree = font.render(str(Desk(sc).tree), True, WHITE)
@@ -190,6 +223,7 @@ count_rock = font.render(str(Desk(sc).rock), True, WHITE)
 
 hero_index = [6, 7]
 stop = 0
+s_l = 0
 
 desk = Desk(sc)
 desk.create_desk()
@@ -202,10 +236,62 @@ while 1:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if 1660 >= c_x >= 1290 and 1024 >= c_y >= 950:
                 exit()
+            if 1660 >= 1290 and 844 >= c_y >= 770:
+                desk.count_intfc = 2
+            if 1660 >= 1290 and 934 >= c_y >= 860:
+                desk.count_intfc = 3
+            if 1660 >= c_x >= 1300 and 154 >= c_y >= 70:
+                if desk.count_intfc == 2:
+                    s = Save(1)
+                    s.save(desk, hero_index)
+                elif desk.count_intfc == 3:
+                    s = Save(1)
+                    desk.dsk = s.file["dsk"]
+                    desk.tree = s.file["tree"]
+                    desk.rock = s.file["rock"]
+                    desk.name = s.file["name"]
+                    desk.lvl = s.file["lvl"]
+                    hero_index = s.file["hero_index"]
+            elif 1660 >= c_x >= 1300 and 244 >= c_y >= 160:
+                if desk.count_intfc == 2:
+                    s = Save(2)
+                    s.save(desk, hero_index)
+                elif desk.count_intfc == 3:
+                    s = Save(2)
+                    desk.dsk = s.file["dsk"]
+                    desk.tree = s.file["tree"]
+                    desk.rock = s.file["rock"]
+                    desk.name = s.file["name"]
+                    desk.lvl = s.file["lvl"]
+                    hero_index = s.file["hero_index"]
+            elif 1660 >= c_x >= 1300 and 334 >= c_y >= 250:
+                if desk.count_intfc == 2:
+                    s = Save(3)
+                    s.save(desk, hero_index)
+                elif desk.count_intfc == 3:
+                    s = Save(3)
+                    desk.dsk = s.file["dsk"]
+                    desk.tree = s.file["tree"]
+                    desk.rock = s.file["rock"]
+                    desk.name = s.file["name"]
+                    desk.lvl = s.file["lvl"]
+                    hero_index = s.file["hero_index"]
             if not desk.building:
                 move(1)
                 count_tree = font.render(str(desk.tree), True, WHITE)
+                count_rock = font.render(str(desk.rock), True, WHITE)
             if 480 < c_x < 720 and 400 < c_y < 640 and desk.building:
+                if desk.build_num == 101:
+                    if desk.tree >= 5:
+                        desk.tree -= 5
+                    else:
+                        break
+                elif desk.build_num == 102:
+                    if desk.tree >= 8:
+                        desk.tree -= 8
+                    else:
+                        break
+                count_tree = font.render(str(desk.tree), True, WHITE)
                 if 720 > c_x - (c_x % 80) > 560 and 640 > c_y - (c_y % 80) > 480:
                     desk.dsk[hero_index[0] + 1][hero_index[1] + 1] = desk.build_num
                 elif 640 > c_x - (c_x % 80) > 480 and 640 > c_y - (c_y % 80) > 480:
@@ -222,6 +308,7 @@ while 1:
                     desk.dsk[hero_index[0]][hero_index[1] + 1] = desk.build_num
                 elif 720 > c_x - (c_x % 80) > 560 and 480 > c_y - (c_y % 80) > 320:
                     desk.dsk[hero_index[0] - 1][hero_index[1] + 1] = desk.build_num
+                desk.build_num = 0
                 desk.building = False
             if desk.count_intfc == 1:
                 if 1375 > c_x > 1295 and 95 > c_y > 15:
@@ -237,10 +324,10 @@ while 1:
 
         if event.type == pygame.KEYDOWN:
             if pygame.K_ESCAPE and desk.building:
+                desk.build_num = 0
                 desk.building = False
             else:
                 move(2)
-                count_tree = font.render(str(desk.tree), True, WHITE)
     desk.show_desk()
     if 480 < c_x < 720 and 400 < c_y < 640:
         if stop == 0:
