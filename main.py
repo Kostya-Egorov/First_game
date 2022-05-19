@@ -11,6 +11,7 @@ class Hero:
         self.count = 0
         self.name = "Nersop"
         self.lvl = 0
+        self.healh = 20
         self.building = False
         self.build_num = 0
 
@@ -18,6 +19,19 @@ class Hero:
         sc.blit(self.hero, (1300, 15))
         sc.blit(font.render(self.name, True, WHITE), (1390, 17))
         sc.blit(font.render("Уровень: " + str(self.lvl), True, WHITE), (1390, 70))
+
+class Enemy:
+    def __init__(self):
+        self.slime = pygame.image.load("Textures/Enemies/Slime.png")
+        self.enemies = []
+
+    def spawn(self):
+        enm = random.randrange(201, 210)
+        x = random.randrange(0, 101)
+        y = random.randrange(0, 101)
+        if enm == 201:
+            self.enemies.append([x, y, 1, 1])
+        desk.dsk[x][y] = enm
 
 
 def move(a):
@@ -65,8 +79,12 @@ def move(a):
         hero_index[0], hero_index[1] = s_x, s_y
     desk.dsk[hero_index[0]][hero_index[1]] = 1
 
+def e_move():
+    for i in desk.enemies:
+        for j in i:
+            pass
 
-class Desk(Hero):
+class Desk(Hero, Enemy):
     def __init__(self, screen):
         super().__init__()
         self.dsk = [[random.randrange(11, 14) for _ in range(100)] for _ in range(100)]
@@ -128,6 +146,8 @@ class Desk(Hero):
                     elif self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 102:
                         self.screen.blit(grass1, (x, y))
                         self.screen.blit(blt_wall, (x, y))
+                    if self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 201:
+                        self.screen.blit(self.slime, (x, y))
                     x += 80
                 x = 0
                 y += 80
@@ -278,6 +298,7 @@ while 1:
                     hero_index = s.file["hero_index"]
             if not desk.building:
                 move(1)
+                e_move()
                 count_tree = font.render(str(desk.tree), True, WHITE)
                 count_rock = font.render(str(desk.rock), True, WHITE)
             if 480 < c_x < 720 and 400 < c_y < 640 and desk.building:

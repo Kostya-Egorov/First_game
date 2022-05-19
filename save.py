@@ -18,6 +18,7 @@ class Save:
         self.file["name"] = d.name
         self.file["lvl"] = d.lvl
         self.file["hero_index"] = i
+        self.file["health"] = d.health
 
     def __del__(self):
         self.file.close()
