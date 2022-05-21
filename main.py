@@ -46,6 +46,15 @@ def move(a):
         if desk.dsk[hero_index[0]][hero_index[1]] == 101:
             desk.count_intfc = 2
         hero_index[0], hero_index[1] = s_x, s_y
+    if desk.dsk[hero_index[0]][hero_index[1]] in spis_e:
+        for i in range(0, len(enemy.enemies)):
+            if hero_index[0] == enemy.enemies[i][1] and hero_index[1] == enemy.enemies[i][2]:
+                enemy.enemies[i][4] -= 1
+                if enemy.enemies[i][4] == 0:
+                    desk.dsk[enemy.enemies[i][1]][enemy.enemies[i][2]] = random.randrange(11, 14)
+                    del enemy.spis_e[spis_e.index(enemy.enemies[i][0])]
+                    del enemy.enemies[i]
+        hero_index[0], hero_index[1] = s_x, s_y
     desk.dsk[hero_index[0]][hero_index[1]] = 1
 
 
@@ -68,12 +77,8 @@ class Desk(Hero, Enemy):
         self.dsk[hero_index[0]][hero_index[1]] = 1
 
     def show_desk(self):
+        self.dsk = enemy.dsk1
         x, y = 0, 0
-
-        for i in enemy.enemies:
-            if i[0] == 201:
-                self.dsk[i[1]][i[2]] = 201
-
         if hero_index[1] < 92:
             for i in range(H // 80):
                 a = ((hero_index[0] - 6) + i) * (((hero_index[0] - 6) + i) > 0)
@@ -213,12 +218,13 @@ count_tree = font.render(str(Desk(sc).tree), True, WHITE)
 count_rock = font.render(str(Desk(sc).rock), True, WHITE)
 
 hero_index = [6, 7]
+spis_e = [201]
 stop = 0
 s_l = 0
 
 desk = Desk(sc)
 desk.create_desk()
-enemy = Enemy(desk.dsk, hero_index, sc)
+enemy = Enemy(desk.dsk, hero_index, sc, desk.health)
 
 while 1:
     c_x, c_y = pygame.mouse.get_pos()
@@ -272,8 +278,12 @@ while 1:
                     hero_index = s.file["hero_index"]
                     desk.health = s.file["health"]
             if not desk.building:
+                if random.randrange(1, 9) == 8:
+                    enemy.spawn()
+                    spis_e = enemy.spis_e
                 move(1)
                 enemy.e_move()
+                desk.health = enemy.h_hp
                 count_tree = font.render(str(desk.tree), True, WHITE)
                 count_rock = font.render(str(desk.rock), True, WHITE)
             if 480 < c_x < 720 and 400 < c_y < 640 and desk.building:

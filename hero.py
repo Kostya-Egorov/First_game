@@ -5,7 +5,7 @@ class Hero:
     def __init__(self, sc):
         self.sc = sc
         self.hero = pygame.image.load("Textures/Hero.png").convert()
-        self.tree = 0
+        self.tree = 8
         self.rock = 0
         self.count = 0
         self.name = "Nersop"
