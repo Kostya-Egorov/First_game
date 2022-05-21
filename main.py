@@ -1,37 +1,6 @@
-import pygame
-import random
 from save import *
-
-
-class Hero:
-    def __init__(self):
-        self.hero = pygame.image.load("Textures/Hero.png").convert()
-        self.tree = 0
-        self.rock = 0
-        self.count = 0
-        self.name = "Nersop"
-        self.lvl = 0
-        self.healh = 20
-        self.building = False
-        self.build_num = 0
-
-    def hero_stats(self, font):
-        sc.blit(self.hero, (1300, 15))
-        sc.blit(font.render(self.name, True, WHITE), (1390, 17))
-        sc.blit(font.render("Уровень: " + str(self.lvl), True, WHITE), (1390, 70))
-
-class Enemy:
-    def __init__(self):
-        self.slime = pygame.image.load("Textures/Enemies/Slime.png")
-        self.enemies = []
-
-    def spawn(self):
-        enm = random.randrange(201, 210)
-        x = random.randrange(0, 101)
-        y = random.randrange(0, 101)
-        if enm == 201:
-            self.enemies.append([x, y, 1, 1])
-        desk.dsk[x][y] = enm
+from enemy import *
+from hero import *
 
 
 def move(a):
@@ -39,14 +8,14 @@ def move(a):
     desk.dsk[hero_index[0]][hero_index[1]] = random.randrange(11, 14)
     s_x, s_y = hero_index[0], hero_index[1]
     if a == 1:
-        c_x, c_y = pygame.mouse.get_pos()
-        if 1280 > c_x - (c_x % 80) > 7 * 80 and hero_index[1] < 91:
+        x, y = pygame.mouse.get_pos()
+        if 1280 > x - (x % 80) > 7 * 80 and hero_index[1] < 91:
             hero_index[1] += 1
-        elif 1280 > c_x - (c_x % 80) < 7 * 80 and hero_index[1] > 0:
+        elif 1280 > x - (x % 80) < 7 * 80 and hero_index[1] > 0:
             hero_index[1] -= 1
-        if 1280 > c_x and c_y - (c_y % 80) > 6 * 80 and hero_index[0] < 93:
+        if 1280 > x and y - (y % 80) > 6 * 80 and hero_index[0] < 93:
             hero_index[0] += 1
-        elif 1280 > c_x and c_y - (c_y % 80) < 6 * 80 and hero_index[0] > 0:
+        elif 1280 > c_x and y - (y % 80) < 6 * 80 and hero_index[0] > 0:
             hero_index[0] -= 1
     if a == 2:
         keys = pygame.key.get_pressed()
@@ -79,14 +48,10 @@ def move(a):
         hero_index[0], hero_index[1] = s_x, s_y
     desk.dsk[hero_index[0]][hero_index[1]] = 1
 
-def e_move():
-    for i in desk.enemies:
-        for j in i:
-            pass
 
 class Desk(Hero, Enemy):
     def __init__(self, screen):
-        super().__init__()
+        super().__init__(sc)
         self.dsk = [[random.randrange(11, 14) for _ in range(100)] for _ in range(100)]
         self.screen = screen
         self.x, self.y = 0, 0
@@ -104,6 +69,11 @@ class Desk(Hero, Enemy):
 
     def show_desk(self):
         x, y = 0, 0
+
+        for i in enemy.enemies:
+            if i[0] == 201:
+                self.dsk[i[1]][i[2]] = 201
+
         if hero_index[1] < 92:
             for i in range(H // 80):
                 a = ((hero_index[0] - 6) + i) * (((hero_index[0] - 6) + i) > 0)
@@ -147,7 +117,8 @@ class Desk(Hero, Enemy):
                         self.screen.blit(grass1, (x, y))
                         self.screen.blit(blt_wall, (x, y))
                     if self.dsk[hero_index[0] - 6 + i][hero_index[1] - 7 + j] == 201:
-                        self.screen.blit(self.slime, (x, y))
+                        self.screen.blit(grass1, (x, y))
+                        self.screen.blit(enemy.slime, (x, y))
                     x += 80
                 x = 0
                 y += 80
@@ -247,6 +218,7 @@ s_l = 0
 
 desk = Desk(sc)
 desk.create_desk()
+enemy = Enemy(desk.dsk, hero_index, sc)
 
 while 1:
     c_x, c_y = pygame.mouse.get_pos()
@@ -272,6 +244,7 @@ while 1:
                     desk.name = s.file["name"]
                     desk.lvl = s.file["lvl"]
                     hero_index = s.file["hero_index"]
+                    desk.health = s.file["health"]
             elif 1660 >= c_x >= 1300 and 244 >= c_y >= 160:
                 if desk.count_intfc == 2:
                     s = Save(2)
@@ -284,6 +257,7 @@ while 1:
                     desk.name = s.file["name"]
                     desk.lvl = s.file["lvl"]
                     hero_index = s.file["hero_index"]
+                    desk.health = s.file["health"]
             elif 1660 >= c_x >= 1300 and 334 >= c_y >= 250:
                 if desk.count_intfc == 2:
                     s = Save(3)
@@ -296,9 +270,10 @@ while 1:
                     desk.name = s.file["name"]
                     desk.lvl = s.file["lvl"]
                     hero_index = s.file["hero_index"]
+                    desk.health = s.file["health"]
             if not desk.building:
                 move(1)
-                e_move()
+                enemy.e_move()
                 count_tree = font.render(str(desk.tree), True, WHITE)
                 count_rock = font.render(str(desk.rock), True, WHITE)
             if 480 < c_x < 720 and 400 < c_y < 640 and desk.building:
@@ -323,9 +298,9 @@ while 1:
                     desk.dsk[hero_index[0]][hero_index[1] - 1] = desk.build_num
                 elif 560 > c_x - (c_x % 80) > 400 and 480 > c_y - (c_y % 80) > 320:
                     desk.dsk[hero_index[0] - 1][hero_index[1] - 1] = desk.build_num
-                elif 640 > c_x - (c_x % 80) > 480 and 480 > c_y - (c_y % 80) > 320:
+                elif 640 > c_x - (c_x % 80) > 480 > c_y - (c_y % 80) > 320:
                     desk.dsk[hero_index[0] - 1][hero_index[1]] = desk.build_num
-                elif 720 > c_x - (c_x % 80) > 560 and 560 > c_y - (c_y % 80) > 400:
+                elif 720 > c_x - (c_x % 80) > 560 > c_y - (c_y % 80) > 400:
                     desk.dsk[hero_index[0]][hero_index[1] + 1] = desk.build_num
                 elif 720 > c_x - (c_x % 80) > 560 and 480 > c_y - (c_y % 80) > 320:
                     desk.dsk[hero_index[0] - 1][hero_index[1] + 1] = desk.build_num
@@ -338,7 +313,7 @@ while 1:
                 elif 1465 > c_x > 1375 and 95 > c_y > 15:
                     desk.building = True
                     desk.build_num = 102
-            if 1437 > c_x > 1290 and 555> c_y > 470:
+            if 1437 > c_x > 1290 and 555 > c_y > 470:
                 desk.count_intfc = 1
             elif 1667 > c_x > 1520 and 555 > c_y > 470:
                 desk.count_intfc = 0
