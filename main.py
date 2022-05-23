@@ -44,17 +44,16 @@ def move(a):
         desk.count = 0
     if 101 <= desk.dsk[hero_index[0]][hero_index[1]] <= 102:
         if desk.dsk[hero_index[0]][hero_index[1]] == 101:
-            desk.count_intfc = 2
+            desk.count_intfc = 4
         hero_index[0], hero_index[1] = s_x, s_y
-    if desk.dsk[hero_index[0]][hero_index[1]] in spis_e:
-        for i in range(0, len(enemy.enemies)):
-            if hero_index[0] == enemy.enemies[i][1] and hero_index[1] == enemy.enemies[i][2]:
-                enemy.enemies[i][4] -= 1
-                if enemy.enemies[i][4] == 0:
-                    desk.dsk[enemy.enemies[i][1]][enemy.enemies[i][2]] = random.randrange(11, 14)
-                    del enemy.spis_e[spis_e.index(enemy.enemies[i][0])]
-                    del enemy.enemies[i]
-        hero_index[0], hero_index[1] = s_x, s_y
+    for i in range(len(enemy.enemies)):
+        if hero_index[0] == enemy.enemies[i][1] and hero_index[1] == enemy.enemies[i][2]:
+            enemy.enemies[i][4] -= 1
+            if enemy.enemies[i][4] == 0:
+                desk.dsk[enemy.enemies[i][1]][enemy.enemies[i][2]] = random.randrange(11, 14)
+                del enemy.spis_e[enemy.spis_e.index(enemy.enemies[i][0])]
+                del enemy.enemies[i]
+            hero_index[0], hero_index[1] = s_x, s_y
     desk.dsk[hero_index[0]][hero_index[1]] = 1
 
 
@@ -67,8 +66,8 @@ class Desk(Hero, Enemy):
         self.count_intfc = 0
 
     def create_desk(self):
-        for i in range(50):
-            for j in range(random.randrange(0, 4), 50, random.randrange(3, 8)):
+        for i in range(100):
+            for j in range(random.randrange(0, 4), 100, random.randrange(3, 8)):
                 b = random.randrange(0, 14)
                 if b == 13:
                     self.dsk[i][j] = random.randrange(30, 33)
@@ -137,6 +136,12 @@ class Desk(Hero, Enemy):
         sc.blit(btn_load, (1290, 860))
         if self.count_intfc == 0:
             desk.hero_stats(font)
+            pygame.draw.rect(sc, (0, 200, 0), (1300, 130, 18 * desk.health, 50))
+            pygame.draw.rect(sc, (0, 0, 0), (1300, 130, 360, 50), 3)
+            sc.blit(font.render(str(desk.health) + " / 20", True, WHITE), (1420, 140))
+            pygame.draw.rect(sc, (100, 200, 0), (1300, 190, 18 * desk.lvl, 50))
+            pygame.draw.rect(sc, (0, 0, 0), (1300, 190, 360, 50), 3)
+            sc.blit(font.render(str(desk.lvl) + " / 10", True, WHITE), (1420, 200))
         elif self.count_intfc == 1:
             sc.blit(blt_chest, (1295, 15))
             sc.blit(price, (1335, 90))
@@ -148,12 +153,12 @@ class Desk(Hero, Enemy):
             sc.blit(font.render(str("Сохранить в:"), True, WHITE), (1340, 16))
             sc.blit(save1_img, (1300, 70))
             sc.blit(save2_img, (1300, 160))
-            sc.blit(save2_img, (1300, 250))
+            sc.blit(save3_img, (1300, 250))
         elif self.count_intfc == 3:
             sc.blit(font.render(str("Загрузить:"), True, WHITE), (1340, 16))
             sc.blit(save1_img, (1300, 70))
             sc.blit(save2_img, (1300, 160))
-            sc.blit(save2_img, (1300, 250))
+            sc.blit(save3_img, (1300, 250))
         sc.blit(count_tree, [1330, 415])
         sc.blit(count_rock, [1445, 415])
 
@@ -241,9 +246,10 @@ while 1:
             if 1660 >= c_x >= 1300 and 154 >= c_y >= 70:
                 if desk.count_intfc == 2:
                     s = Save(1)
-                    s.save(desk, hero_index)
+                    s.save(desk, hero_index, enemy)
                 elif desk.count_intfc == 3:
                     s = Save(1)
+                    desk.dsk[hero_index[0]][hero_index[1]] = random.randrange(11, 14)
                     desk.dsk = s.file["dsk"]
                     desk.tree = s.file["tree"]
                     desk.rock = s.file["rock"]
@@ -251,12 +257,17 @@ while 1:
                     desk.lvl = s.file["lvl"]
                     hero_index = s.file["hero_index"]
                     desk.health = s.file["health"]
+                    enemy.enemies = s.file["enemy"]
+                    enemy.spis_e = s.file["s_e"]
+                    enemy = Enemy(desk.dsk, hero_index, sc, desk.health, enemy.enemies, enemy.spis_e)
+                    desk.show_desk()
             elif 1660 >= c_x >= 1300 and 244 >= c_y >= 160:
                 if desk.count_intfc == 2:
                     s = Save(2)
-                    s.save(desk, hero_index)
+                    s.save(desk, hero_index, enemy)
                 elif desk.count_intfc == 3:
                     s = Save(2)
+                    desk.dsk[hero_index[0]][hero_index[1]] = random.randrange(11, 14)
                     desk.dsk = s.file["dsk"]
                     desk.tree = s.file["tree"]
                     desk.rock = s.file["rock"]
@@ -264,12 +275,17 @@ while 1:
                     desk.lvl = s.file["lvl"]
                     hero_index = s.file["hero_index"]
                     desk.health = s.file["health"]
+                    enemy.enemies = s.file["enemy"]
+                    enemy.spis_e = s.file["s_e"]
+                    enemy = Enemy(desk.dsk, hero_index, sc, desk.health, enemy.enemies, enemy.spis_e)
+                    desk.show_desk()
             elif 1660 >= c_x >= 1300 and 334 >= c_y >= 250:
                 if desk.count_intfc == 2:
                     s = Save(3)
-                    s.save(desk, hero_index)
+                    s.save(desk, hero_index, enemy)
                 elif desk.count_intfc == 3:
                     s = Save(3)
+                    desk.dsk[hero_index[0]][hero_index[1]] = random.randrange(11, 14)
                     desk.dsk = s.file["dsk"]
                     desk.tree = s.file["tree"]
                     desk.rock = s.file["rock"]
@@ -277,6 +293,10 @@ while 1:
                     desk.lvl = s.file["lvl"]
                     hero_index = s.file["hero_index"]
                     desk.health = s.file["health"]
+                    enemy.enemies = s.file["enemy"]
+                    enemy.spis_e = s.file["s_e"]
+                    enemy = Enemy(desk.dsk, hero_index, sc, desk.health, enemy.enemies, enemy.spis_e)
+                    desk.show_desk()
             if not desk.building:
                 if random.randrange(1, 9) == 8:
                     enemy.spawn()

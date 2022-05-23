@@ -1,4 +1,5 @@
 import shelve
+from enemy import *
 
 
 class Save:
@@ -10,8 +11,8 @@ class Save:
         elif numb == 3:
             self.file = shelve.open("Saves/save3")
 
-    def save(self, d, i):
-        d.dsk[i[0]][i[1]] = 0
+    def save(self, d, i, e):
+        d.dsk[i[0]][i[1]] = random.randrange(11, 14)
         self.file["dsk"] = d.dsk
         self.file["tree"] = d.tree
         self.file["rock"] = d.rock
@@ -19,6 +20,8 @@ class Save:
         self.file["lvl"] = d.lvl
         self.file["hero_index"] = i
         self.file["health"] = d.health
+        self.file["enemy"] = e.enemies
+        self.file["s_e"] = e.spis_e
 
     def __del__(self):
         self.file.close()
